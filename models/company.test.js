@@ -14,14 +14,52 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-
+// Original findAll test
 describe("findAll", function () {
-  test("all", async function () {
+  test("all no filter", async function () {
     let companies = await Company.findAll();
     expect(companies).toEqual([
       { handle: "c1", name: "C1" },
       { handle: "c2", name: "C2" },
       { handle: "c3", name: "C3" },
+    ]);
+  });
+
+  test("filter num_employees > 2", async function () {
+    let companies = await Company.findAll(
+      {filters: ['num_employees $1'], 
+      values: ['>2']
+    });
+    expect(companies).toEqual([
+      { handle: "c3", name: "C3" },
+    ]);
+  });
+
+  test("filter 1 < num_employees < 3", async function () {
+    let companies = await Company.findAll(
+      {filters: ['num_employees $1', ' AND num_employees $2'], 
+      values: ['>1', '< 3']
+    });
+    expect(companies).toEqual([
+      { handle: "c2", name: "C2" },
+    ]);
+  });
+
+  test("filter num_employees > largest company", async function () {
+    let companies = await Company.findAll(
+      {filters: ['num_employees $1'], 
+      values: ['>3']
+    });
+    expect(companies).toEqual([]);
+  });
+
+  test("filter name (case insensitve) ", async function () {
+    let companies = await Company.findAll(
+      {filters: ['name $1'], 
+      values: ['c2']
+    });
+    expect(companies).toEqual([
+      { handle: "c2", name: "C2" },
     ]);
   });
 });
@@ -48,6 +86,7 @@ describe("get", function () {
     }
   });
 });
+
 
 describe("create", function () {
   test("succeeds", async function () {
