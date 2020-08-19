@@ -12,11 +12,19 @@ class Company {
    * Returns [{ handle, name }, ...] (empty list if none found)
    * */
 
-  static async findAll() {
+  //  TODO: make sure this handles sql injection
+  static async findAll(userFilters) {
+    // let filters;
+    let where =''
+    if (Object.keys(userFilters).length > 0){
+      where = $1
+    }
+    const filter = sqlForFiltering(userFilters);
     const companiesRes = await db.query(
         `SELECT handle, name
            FROM companies
-           ORDER BY name`);
+           ${where}
+           ORDER BY name`, [filter]);
     return companiesRes.rows;
   }
 
@@ -100,7 +108,7 @@ class Company {
                       SET ${setCols} 
                       WHERE handle = ${handleVarIdx} 
                       RETURNING handle, 
-                                name, 
+                                name,
                                 num_employees, 
                                 description, 
                                 logo_url`;

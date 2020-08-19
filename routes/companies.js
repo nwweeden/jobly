@@ -11,6 +11,7 @@ const Company = require("../models/Company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const companyGetSchema = require("../schemas/companyGet.json");
 
 const router = new express.Router();
 
@@ -25,8 +26,13 @@ const router = new express.Router();
  **/
 
 router.get("/", async function (req, res, next) {
-  try {
-    const companies = await Company.findAll();
+try {
+  const validator = jsonschema.validate(req.body, companyGetSchema);
+  if (!validator.valid) {
+    const errs = validator.errors.map(e => e.stack);
+    throw new BadRequestError(errs);
+  }
+  const companies = await Company.findAll(req.body);
     return res.json({ companies });
   } catch (err) {
     return next(err);
