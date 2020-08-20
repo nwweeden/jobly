@@ -14,7 +14,6 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-// Original findAll test
 describe("findAll", function () {
   test("all no filter", async function () {
     let companies = await Company.findAll({});
@@ -26,55 +25,39 @@ describe("findAll", function () {
   });
 
   test("filter num_employees >= 3", async function () {
-    let companies = await Company.findAll({
-      minEmployees: 3
-    });
-    expect(companies).toEqual(
-      [
-          { 
-            handle: "c3",
-            name: "C3"
-          }
-        ]
-      );
-    });
+    let companies = await Company.findAll(
+      {minEmployees: 3}
+    );
+    expect(companies).toEqual([
+      {handle: "c3", name: "C3"}
+    ]);
+  });
 
   test("filter num_employees <=2", async function () {
-    let companies = await Company.findAll({
-      maxEmployees: 2
-    });
-    expect(companies).toEqual(
-      [
-          { 
-            handle: "c1",
-            name: "C1"
-          },
-          { 
-            handle: "c2",
-            name: "C2"
-          }
-        ]
-      );
+    let companies = await Company.findAll(
+      {maxEmployees: 2}
+    );
+    expect(companies).toEqual([
+        {handle: "c1", name: "C1"},
+        {handle: "c2", name: "C2"}
+      ]);
     });
   
   test("filter num_employees > largest company", async function () {
-    let companies = await Company.findAll({
-      minEmployees: 4
-    });
+    let companies = await Company.findAll(
+      {minEmployees: 4}
+    );
     expect(companies).toEqual([]);
-    });
+  });
   
   test("filter name (case insensitve)", async function () {
-    let companies = await Company.findAll({
-      name: 'c2'
-    });
-    expect(companies).toEqual(
-      [{ 
-        handle: "c2",
-        name: "C2"
-      }]
-      );
-    });
+    let companies = await Company.findAll(
+      {name: 'c2'}
+    );
+    expect(companies).toEqual([
+      { handle: "c2", name: "C2"}
+    ]);
+  });
 
   test("min > max", async function () {
     expect.assertions(1);
@@ -89,15 +72,12 @@ describe("findAll", function () {
   })
   
   test("filter like name", async function () {
-    let companies = await Company.findAll({
-      name: '2'
-    });
-    expect(companies).toEqual(
-      [{ 
-        handle: "c2",
-        name: "C2"
-      }]
-      );
+    let companies = await Company.findAll(
+      {name: '2'}
+    );
+    expect(companies).toEqual([
+      {handle: "c2",name: "C2"}
+    ]);
   });
 })
 

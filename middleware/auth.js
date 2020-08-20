@@ -17,6 +17,7 @@ const { UnauthorizedError } = require("../expressError");
  *
  **/
 
+//  TODO: to check if admin, check if res.locals.user is admin?
 function authenticateJWT(req, res, next) {
   try {
     const token = req.body._token;

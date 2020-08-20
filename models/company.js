@@ -12,19 +12,16 @@ class Company {
    * Returns [{ handle, name }, ...] (empty list if none found)
    * */
 
-  // * {name: c3, minEmployees: 2} ==>
-  // * {whereClause: 'WHERE upper(name) = $1 AND num_employees >= $2',
-  // * values: [C3, 2]}
-
   static async findAll(userFilters) {
     let filterValues;
     let where ='';
     debugger;
+    /*if there are filters, organize them in a WHERE clause*/
     if (Object.keys(userFilters).length > 0){
       const filters = sqlForFiltering(userFilters);
       where = filters.whereClause;
       filterValues = filters.values;
-      console.log('filterValues', filterValues);
+      // console.log('filterValues', filterValues);
     }
     const companiesRes = await db.query(
         `SELECT handle, name
