@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForFiltering } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -12,19 +12,24 @@ class Company {
    * Returns [{ handle, name }, ...] (empty list if none found)
    * */
 
-  //  TODO: make sure this handles sql injection
+  // * {name: c3, minEmployees: 2} ==>
+  // * {whereClause: 'WHERE upper(name) = $1 AND num_employees >= $2',
+  // * values: [C3, 2]}
+
   static async findAll(userFilters) {
-    // let filters;
+    let filterValues;
     let where =''
     if (Object.keys(userFilters).length > 0){
-      where = $1
+      const filters = sqlForFiltering(userFilters);
+      where = filters.whereClause;
+      filterValues = filters.filters;
+      console.log('filterValues', filterValues);
     }
-    const filter = sqlForFiltering(userFilters);
     const companiesRes = await db.query(
         `SELECT handle, name
            FROM companies
            ${where}
-           ORDER BY name`, [filter]);
+           ORDER BY name`, filterValues);
     return companiesRes.rows;
   }
 

@@ -25,30 +25,50 @@ function sqlForPartialUpdate(dataToUpdate) {
  * iterate through each key and construct/return where clause
  * 
  * {name: c3, minEmployees: 2} ==>
- * 'WHERE name = c3 AND maxEmployees >= 2'
+ * {whereClause: 'WHERE upper(name) = $1 AND num_employees >= $2',
+ * values: [C3, 2]}
  */
 function sqlForFiltering(userFilters) {
-  if (Object.keys(userFilters).length === 0) return '';
+  // if (Object.keys(userFilters).length === 0) return '';
+  console.log('In sqlForFiltering');
   
   if (userFilters.minEmployees && userFilters.maxEmployees){
     if (userFilters.minEmployees > userFilters.maxEmployees){
       throw new BadRequestError
     }
   }
-  let si = 1;
 
-  let result = 'WHERE';
-  let values = [];
+  /*
+  Example Query: 
+  SELECT handle, name
+           FROM companies
+           WHERE upper(name) = C3 AND num_employees >=2
+           ORDER BY name` 
+  */
+
+  let sanitizer = 1;
+  let whereClause = 'WHERE';
+  let filters = [];
+  console.log('userFilters:', userFilters);
   if(userFilters.name){
-    result += ` upper(name) = $${si} AND`
-    si++
-    values.push(userFilters.name);
+    whereClause += ` upper(name) = $${sanitizer} AND`
+    sanitizer++
+    filters.push(userFilters.name.toUpperCase());
   }
-  if(userFilters.minEmployees) result += ` numEmployees >= ${userFilters.minEmployees} AND`
-  if(userFilters.maxEmployees) result += ` numEmployees <= ${userFilters.maxEmployees} AND`
+  if(userFilters.minEmployees) {
+    whereClause += ` num_employees >= $${sanitizer} AND`;
+    sanitizer++;
+    filters.push(userFilters.minEmployees);
+  }
+  if(userFilters.maxEmployees) {
+    whereClause += ` num_employees <= $${sanitizer} AND`;
+    filters.push(userFilters.maxEmployees);
+  } 
 
-  result = result.slice(0, -4)
-  return {result, values};
+  const removeAnd = -4;
+  whereClause = whereClause.slice(0, removeAnd);
+  console.log('Return Object from sqlForFiltering', {whereClause, filters});
+  return {whereClause, filters};
 }
 
 module.exports = { sqlForPartialUpdate, sqlForFiltering };
