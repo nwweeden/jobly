@@ -62,28 +62,30 @@ function ensureLoggedIn(req, res, next) {
 // This is written with an inner function to perform the security check or throw
 // an error: this makes this easily unit-tested.
 
-// function _ensureAdmin(req, res) {
-//   if (res.locals.user.is_admin === false)
-//    throw new UnauthorizedError();
-// }
+function _ensureAdmin(req, res) {
+  if (res.locals.user.is_admin === false ||
+    !res.locals.user) {
+    throw new UnauthorizedError();
+  }
+}
 
 // The outer function can be integration tested when used in Express. This is
 // the function that should be included as middleware.
 
-// function ensureAdmin(req, res, next) {
-//   try {
-//     _ensureAdmin(req, res);
-//     return next();
-//   } catch (err) {
-//     return next(err);
-//   }
-// }
+function ensureAdmin(req, res, next) {
+  try {
+    _ensureAdmin(req, res);
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
 
 
 module.exports = {
   authenticateJWT,
   _ensureLoggedIn,
   ensureLoggedIn,
-  // _ensureAdmin,
-  // ensureAdmin
+  _ensureAdmin,
+  ensureAdmin
 };

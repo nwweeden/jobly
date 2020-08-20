@@ -155,7 +155,7 @@ describe("PATCH /companies/:handle", function () {
         .send({
           name: "C1-new",
         });
-    expect(resp.statusCode).toEqual(401);
+    expect(resp.statusCode).toEqual(400);
   });
 
   test("fails on handle change attempt", async function () {

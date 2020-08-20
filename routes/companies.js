@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn, /*ensureAdmin*/ } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Company = require("../models/Company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
@@ -66,8 +66,7 @@ router.get("/:handle", async function (req, res, next) {
  * Authorization required: admin
  **/
 
-//  TODO: Add in admin auth to middleware
-router.post("/", ensureLoggedIn, async function (req, res, next) {
+router.post("/", ensureAdmin, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, companyNewSchema);
     if (!validator.valid) {
@@ -93,7 +92,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: admin
  **/
 
-router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
+router.patch("/:handle", ensureAdmin, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, companyUpdateSchema);
     if (!validator.valid) {
@@ -113,7 +112,7 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
  * Authorization: admin
  **/
 
-router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
+router.delete("/:handle", ensureAdmin, async function (req, res, next) {
   try {
     await Company.remove(req.params.handle);
     return res.json({ deleted: req.params.handle });
