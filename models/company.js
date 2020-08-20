@@ -11,7 +11,7 @@ class Company {
    *
    * Returns [{ handle, name }, ...] (empty list if none found)
    * */
-
+  // CR: 
   static async findAll(userFilters) {
     let filterValues;
     let where ='';
