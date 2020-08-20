@@ -17,7 +17,6 @@ const { UnauthorizedError } = require("../expressError");
  *
  **/
 
-//  TODO: to check if admin, check if res.locals.user is admin?
 function authenticateJWT(req, res, next) {
   try {
     const token = req.body._token;
@@ -55,9 +54,36 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
+/** Middleware to use when they must be admin.
+ *
+ * If not, raises Unauthorized.
+ **/
+
+// This is written with an inner function to perform the security check or throw
+// an error: this makes this easily unit-tested.
+
+// function _ensureAdmin(req, res) {
+//   if (res.locals.user.is_admin === false)
+//    throw new UnauthorizedError();
+// }
+
+// The outer function can be integration tested when used in Express. This is
+// the function that should be included as middleware.
+
+// function ensureAdmin(req, res, next) {
+//   try {
+//     _ensureAdmin(req, res);
+//     return next();
+//   } catch (err) {
+//     return next(err);
+//   }
+// }
+
 
 module.exports = {
   authenticateJWT,
   _ensureLoggedIn,
   ensureLoggedIn,
+  // _ensureAdmin,
+  // ensureAdmin
 };
