@@ -28,6 +28,7 @@ class Company {
            FROM companies
            ${where}
            ORDER BY name`, filterValues);
+
     return companiesRes.rows;
   }
 
