@@ -1,6 +1,7 @@
 "use strict";
 
 const db = require("../db");
+const { sqlForPartialUpdate, sqlForFiltering } = require("../helpers/sql");
 
 const {
   BadRequestError,
@@ -16,8 +17,8 @@ class Job {
   static async findAll() {
     const jobsRes = await db.query(
       `SELECT id, title
-      From jobs
-      Order BY title`
+      FROM jobs
+      ORDER BY title`
     );
 
     return jobsRes.rows;
@@ -61,7 +62,6 @@ class Job {
            VALUES ($1, $2, $3, $4)
            RETURNING id, title, salary, equity, company_handle`,
         [
-          id,
           title,
           salary,
           equity,

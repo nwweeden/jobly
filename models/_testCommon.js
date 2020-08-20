@@ -37,13 +37,13 @@ async function commonBeforeAll() {
 
   // Creating Jobs
   await db.query(`
-  INSERT INTO jobs(title,
-                  salary,
-                  equity,
-                  company_handle)
-  VALUES ('engineer', 1000, .2, c1),
-        ('recruiter', 12000, null, c1),
-        ('cfo', 10000, .1, c2)`);
+    INSERT INTO jobs(title,
+                    salary,
+                    equity,
+                    company_handle)
+    VALUES ('engineer', 1000, .2, 'c1'),
+          ('recruiter', 12000, null, 'c1'),
+          ('cfo', 10000, .1, 'c2')`);
 }
 
 async function commonBeforeEach() {

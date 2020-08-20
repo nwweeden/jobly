@@ -6,29 +6,39 @@ const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
-  commonAfterAll,
+  commonAfterAll
 } = require("./_testCommon");
 
+let engId;
 beforeAll(commonBeforeAll);
-beforeEach(commonBeforeEach);
-afterEach(commonAfterEach);
-afterAll(commonAfterAll);
 
-const engineerId = await db.query(`
+beforeEach(async function() {
+  await commonBeforeEach();
+  /*get an id for one of our jobs to use in tests*/
+  const engResult = await db.query(`
     SELECT id
     FROM jobs
-    WHERE title = engineer
-  `);
+    WHERE title = 'engineer'
+  `)
+  // console.log("@@@@@@@@@@@@@ENGRESULT", engResult)
+  engId = engResult.rows[0].id
+});
+
+afterEach(commonAfterEach);
+afterAll(commonAfterAll);
 
 describe("findAll", function () {
   test("all no filter", async function () {
     let jobs = await Job.findAll();
     expect(jobs).toEqual([
-      { id: expect.any(integer), title: "engineer" },
-      { id: expect.any(integer), title: "recruiter" },
-      { id: expect.any(integer), title: "cfo" },
+      { id: expect.any(Number), title: "cfo" },
+      { id: expect.any(Number), title: "engineer" },
+      { id: expect.any(Number), title: "recruiter" },
     ]);
   });
+
+// TODO: remove this when we uncomment below
+});
 
 //   test("filter num_employees >= 3", async function () {
 //     let companies = await Company.findAll(
@@ -89,12 +99,12 @@ describe("findAll", function () {
 
 describe("get", function() {
   test("succeeds", async function () {
-    let job = await Job.get(engineerId);
+    let job = await Job.get(engId);
     expect(job).toEqual({
-      id: engineerId,
+      id: engId,
       title: "engineer",
       salary: 1000,
-      equity: ".2",
+      equity: "0.2",
       company_handle: "c1",
     });
   });
@@ -102,7 +112,7 @@ describe("get", function() {
   test("fails", async function () {
     expect.assertions(1);
     try {
-      await Company.get("nope");
+      await Job.get("nope");
     } catch (err) {
       expect(err).toBeTruthy();
     }
@@ -112,73 +122,74 @@ describe("get", function() {
 
 describe("create", function () {
   test("succeeds", async function () {
-    let company = await Company.create({
-      handle: "test",
-      name: "Test",
-      num_employees: 1,
-      description: "Test Description",
-      logo_url: "http://test.img",
+    let job = await Job.create({
+      title: "Test",
+      salary: 1,
+      equity: 0.23,
+      company_handle: "c2",
     });
-    expect(company).toEqual({
-      handle: "test",
-      name: "Test",
-      num_employees: 1,
-      description: "Test Description",
-      logo_url: "http://test.img",
+
+    expect(job).toEqual({
+      id: expect.any(Number),
+      title: "Test",
+      salary: 1,
+      equity: "0.23",
+      company_handle: "c2",
     });
+    /**Filtering by title because only one job with title 'test' */
     const result = await db.query(`SELECT *
-                                   FROM companies
-                                   WHERE handle = 'test'`);
+                                   FROM jobs
+                                   WHERE title = 'Test'`);
     expect(result.rows).toEqual([
       {
-        handle: "test",
-        name: "Test",
-        num_employees: 1,
-        description: "Test Description",
-        logo_url: "http://test.img",
+        id: expect.any(Number),
+        title: "Test",
+        salary: 1,
+        equity: "0.23",
+        company_handle: "c2",
       },
     ]);
   });
 
-  test("fails with dupe", async function () {
-    expect.assertions(1);
-    try {
-      await Company.create({
-        handle: "c1",
-        name: "Test",
-        num_employees: 1,
-        description: "Test Description",
-        logo_url: "http://test.img",
-      });
-    } catch (err) {
-      expect(err).toBeTruthy();
-    }
-  });
+  /*Not testing for dupe because a company can post the same job*/
+  // test("fails with dupe", async function () {
+  //   expect.assertions(1);
+  //   try {
+  //     await Job.create({
+  //       title: "Test",
+  //       salary: 1,
+  //       equity: 0.23,
+  //       company_handle: "c2",
+  //     });
+  //   } catch (err) {
+  //     expect(err).toBeTruthy();
+  //   }
+  // });
 });
 
 describe("update", function () {
   test("succeeds", async function () {
-    let company = await Company.update("c1", {
-      name: "New",
+    let job = await Job.update(engId, {
+      title: "New",
     });
-    expect(company).toEqual({
-      handle: "c1",
-      name: "New",
-      num_employees: 1,
-      description: "Desc1",
-      logo_url: "http://c1.img",
+    expect(job).toEqual({
+      id: engId,
+      title: "New",
+      salary: 1000,
+      equity: '0.2',
+      company_handle: "c1",
     });
 
     const result = await db.query(`SELECT *
-                                   FROM companies
-                                   WHERE handle = 'c1'`);
+                                   FROM jobs
+                                   WHERE id = ${engId}`);
     expect(result.rows).toEqual([
       {
-        handle: "c1",
-        name: "New",
-        num_employees: 1,
-        description: "Desc1",
-        logo_url: "http://c1.img",
+        id: engId,
+        title: "New",
+        salary: 1000,
+        equity: '0.2',
+        company_handle: "c1",
       },
     ]);
   });
@@ -186,7 +197,7 @@ describe("update", function () {
   test("fails if not found", async function () {
     expect.assertions(1);
     try {
-      await Company.update("nope", {
+      await Job.update("nope", {
         name: "New",
       });
     } catch (err) {
@@ -197,7 +208,7 @@ describe("update", function () {
   test("fails with no data", async function () {
     expect.assertions(1);
     try {
-      await Company.update("c1", {});
+      await Job.update(engId, {});
     } catch (err) {
       expect(err).toBeTruthy();
     }
@@ -207,18 +218,18 @@ describe("update", function () {
 
 describe("remove", function () {
   test("succeeds", async function () {
-    await Company.remove("c1");
+    await Job.remove(engId);
     const res = await db.query(
-        "SELECT * FROM companies WHERE handle=$1", ["c1"]);
+        "SELECT * FROM jobs WHERE id=$1", [engId]);
     expect(res.rows.length).toEqual(0);
   });
 
   test("fails if not found", async function () {
     expect.assertions(1);
     try {
-      await Company.remove("nope");
+      await Job.remove("nope");
     } catch (err) {
       expect(err).toBeTruthy();
     }
   });
-});
+})
