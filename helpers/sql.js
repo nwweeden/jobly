@@ -45,30 +45,33 @@ function sqlForFiltering(userFilters) {
            WHERE upper(name) = C3 AND num_employees >=2
            ORDER BY name` 
   */
-
+// TODO: name is like the name put in, not exact
   let sanitizer = 1;
   let whereClause = 'WHERE';
-  let filters = [];
+  let values = [];
   console.log('userFilters:', userFilters);
   if(userFilters.name){
-    whereClause += ` upper(name) = $${sanitizer} AND`
+    whereClause += ` upper(name) LIKE $${sanitizer} AND`
     sanitizer++
-    filters.push(userFilters.name.toUpperCase());
+    let revizedName = '%'+ (userFilters.name.toUpperCase()) +'%'
+    values.push(revizedName);
+    // values.push(userFilters.name.toUpperCase());
+
   }
   if(userFilters.minEmployees) {
     whereClause += ` num_employees >= $${sanitizer} AND`;
     sanitizer++;
-    filters.push(userFilters.minEmployees);
+    values.push(userFilters.minEmployees);
   }
   if(userFilters.maxEmployees) {
     whereClause += ` num_employees <= $${sanitizer} AND`;
-    filters.push(userFilters.maxEmployees);
+    values.push(userFilters.maxEmployees);
   } 
 
   const removeAnd = -4;
   whereClause = whereClause.slice(0, removeAnd);
-  console.log('Return Object from sqlForFiltering', {whereClause, filters});
-  return {whereClause, filters};
+  console.log('Return Object from sqlForFiltering', {whereClause, values});
+  return {whereClause, values};
 }
 
 module.exports = { sqlForPartialUpdate, sqlForFiltering };

@@ -17,7 +17,7 @@ afterAll(commonAfterAll);
 // Original findAll test
 describe("findAll", function () {
   test("all no filter", async function () {
-    let companies = await Company.findAll();
+    let companies = await Company.findAll({});
     expect(companies).toEqual([
       { handle: "c1", name: "C1" },
       { handle: "c2", name: "C2" },
@@ -25,45 +25,81 @@ describe("findAll", function () {
     ]);
   });
 
-  test("filter num_employees > 2", async function () {
-    let companies = await Company.findAll(
-      {filters: ['num_employees $1'], 
-      values: ['>2']
+  test("filter num_employees >= 3", async function () {
+    let companies = await Company.findAll({
+      minEmployees: 3
     });
-    expect(companies).toEqual([
-      { handle: "c3", name: "C3" },
-    ]);
-  });
-
-  test("filter 1 < num_employees < 3", async function () {
-    let companies = await Company.findAll(
-      {filters: ['num_employees $1', ' AND num_employees $2'], 
-      values: ['>1', '< 3']
+    expect(companies).toEqual(
+      [
+          { 
+            handle: "c3",
+            name: "C3"
+          }
+        ]
+      );
     });
-    expect(companies).toEqual([
-      { handle: "c2", name: "C2" },
-    ]);
-  });
 
+  test("filter num_employees <=2", async function () {
+    let companies = await Company.findAll({
+      maxEmployees: 2
+    });
+    expect(companies).toEqual(
+      [
+          { 
+            handle: "c1",
+            name: "C1"
+          },
+          { 
+            handle: "c2",
+            name: "C2"
+          }
+        ]
+      );
+    });
+  
   test("filter num_employees > largest company", async function () {
-    let companies = await Company.findAll(
-      {filters: ['num_employees $1'], 
-      values: ['>3']
+    let companies = await Company.findAll({
+      minEmployees: 4
     });
     expect(companies).toEqual([]);
-  });
-
-  test("filter name (case insensitve) ", async function () {
-    let companies = await Company.findAll(
-      {filters: ['name $1'], 
-      values: ['c2']
     });
-    expect(companies).toEqual([
-      { handle: "c2", name: "C2" },
-    ]);
-  });
-});
+  
+  test("filter name (case insensitve)", async function () {
+    let companies = await Company.findAll({
+      name: 'c2'
+    });
+    expect(companies).toEqual(
+      [{ 
+        handle: "c2",
+        name: "C2"
+      }]
+      );
+    });
 
+  test("min > max", async function () {
+    expect.assertions(1);
+    try {
+      await Company.findAll({
+        minEmployees: 3,
+        maxEmployees: 2
+      })
+    } catch (err) {
+      expect(err).toBeTruthy();
+    }
+  })
+  
+  test("filter like name", async function () {
+    let companies = await Company.findAll({
+      name: '2'
+    });
+    expect(companies).toEqual(
+      [{ 
+        handle: "c2",
+        name: "C2"
+      }]
+      );
+  });
+})
 
 describe("get", function () {
   test("succeeds", async function () {

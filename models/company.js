@@ -18,11 +18,12 @@ class Company {
 
   static async findAll(userFilters) {
     let filterValues;
-    let where =''
+    let where ='';
+    debugger;
     if (Object.keys(userFilters).length > 0){
       const filters = sqlForFiltering(userFilters);
       where = filters.whereClause;
-      filterValues = filters.filters;
+      filterValues = filters.values;
       console.log('filterValues', filterValues);
     }
     const companiesRes = await db.query(

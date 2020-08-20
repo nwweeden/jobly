@@ -32,6 +32,7 @@ try {
     const errs = validator.errors.map(e => e.stack);
     throw new BadRequestError(errs);
   }
+  console.log('req.body',req.body);
   const companies = await Company.findAll(req.body);
     return res.json({ companies });
   } catch (err) {
