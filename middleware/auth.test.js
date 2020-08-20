@@ -4,7 +4,8 @@ const jwt = require("jsonwebtoken");
 const {
   authenticateJWT,
   _ensureLoggedIn,
-  _ensureAdmin
+  _ensureAdmin,
+  ensureLoggedIn
 } = require("./auth");
 
 
@@ -47,7 +48,7 @@ describe("authenticateJWT", function () {
   });
 });
 
-
+/**test not currently needed as function is not used */
 describe("_ensureLoggedIn", function () {
   test("success", function () {
     const req = {};
@@ -67,6 +68,25 @@ describe("_ensureLoggedIn", function () {
   });
 });
 
+// describe("ensureLoggedIn", function () {
+//   test("success", function () {
+//     const req = {};
+//     const res = { locals: { user: { username: "test", is_admin: false } } };
+//     ensureLoggedIn(req, res);
+//   });
+
+//   test("failure", function () {
+//     expect.assertions = 1;
+//     const req = {};
+//     const res = { locals: {} };
+//     try {
+//       ensureLoggedIn(req, res);
+//     } catch (err) {
+//       expect(err).toBeTruthy();
+//     }
+//   });
+// });
+
 
 describe("_ensureAdmin", function () {
   test("success", function () {
@@ -75,23 +95,23 @@ describe("_ensureAdmin", function () {
     _ensureAdmin(req, res);
   });
 
-  test("failure", function () {
+  test("_ensureAdmin failure", function () {
     expect.assertions = 1;
     const req = {};
     const res = { locals: { user: { username: "test", is_admin: false } }  };
     try {
-      _ensureLoggedIn(req, res);
+      _ensureAdmin(req, res);
     } catch (err) {
       expect(err).toBeTruthy();
     }
   });
 
-  test("failure - Not logged in", function () {
+  test("_ensureAdmin failure - Not logged in", function () {
     expect.assertions = 1;
     const req = {};
     const res = { locals: {} };
     try {
-      _ensureLoggedIn(req, res);
+      _ensureAdmin(req, res);
     } catch (err) {
       expect(err).toBeTruthy();
     }

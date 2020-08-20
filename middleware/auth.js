@@ -4,7 +4,7 @@
 
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
-const { UnauthorizedError } = require("../expressError");
+const { UnauthorizedError, BadRequestError } = require("../expressError");
 
 
 /** Middleware: Authenticate user.
@@ -63,10 +63,9 @@ function ensureLoggedIn(req, res, next) {
 // an error: this makes this easily unit-tested.
 
 function _ensureAdmin(req, res) {
-  if (res.locals.user.is_admin === false ||
-    !res.locals.user) {
+  // if (res.locals.user === undefined) throw new BadRequestError();
+  if (!res.locals.user || res.locals.user.is_admin === false)
     throw new UnauthorizedError();
-  }
 }
 
 // The outer function can be integration tested when used in Express. This is

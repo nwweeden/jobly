@@ -31,29 +31,29 @@ function sqlForFiltering(userFilters) {
   console.log('ENTERED INTO sqlForFilter FUNCTION')
   if (userFilters.minEmployees && userFilters.maxEmployees){
     if (userFilters.minEmployees > userFilters.maxEmployees){
-      throw new BadRequestError
+      throw new BadRequestError('min cannot be greater than max')
     }
   }
 
-  let sanitizer = 1;
+  let filterPlaceholder = 1;
   let whereClause = 'WHERE';
   let values = [];
 
   if(userFilters.name){
-    whereClause += ` upper(name) LIKE $${sanitizer} AND`;
-    sanitizer++;
-    let revizedName = '%'+ (userFilters.name.toUpperCase()) +'%';
+    whereClause += ` name ILIKE $${filterPlaceholder} AND`;
+    filterPlaceholder++;
+    let revizedName = '%'+ (userFilters.name) +'%';
     values.push(revizedName);
   }
 
   if(userFilters.minEmployees) {
-    whereClause += ` num_employees >= $${sanitizer} AND`;
-    sanitizer++;
+    whereClause += ` num_employees >= $${filterPlaceholder} AND`;
+    filterPlaceholder++;
     values.push(userFilters.minEmployees);
   }
 
   if(userFilters.maxEmployees) {
-    whereClause += ` num_employees <= $${sanitizer} AND`;
+    whereClause += ` num_employees <= $${filterPlaceholder} AND`;
     values.push(userFilters.maxEmployees);
   } 
 

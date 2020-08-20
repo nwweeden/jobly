@@ -15,7 +15,7 @@ class Company {
   static async findAll(userFilters) {
     let filterValues;
     let where ='';
-    debugger;
+    // debugger;
     /*if there are filters, organize them in a WHERE clause*/
     if (Object.keys(userFilters).length > 0){
       const filters = sqlForFiltering(userFilters);
