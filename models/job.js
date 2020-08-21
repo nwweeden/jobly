@@ -5,7 +5,7 @@ const { sqlForPartialUpdate, sqlForFiltering } = require("../helpers/sql");
 
 const {
   BadRequestError,
-  UnauthorizedError,
+  NotFoundError,
 } = require("../expressError");
 
 class Job {
@@ -14,7 +14,7 @@ class Job {
    *
    * Returns [{ id, title }, ...] (empty list if none found)
    * */
-  static async findAll({}) {
+  static async findAll(jobFilters) {
     const jobsRes = await db.query(
       `SELECT id, title
       FROM jobs
@@ -32,6 +32,7 @@ class Job {
    **/
 
   static async get(id) {
+    if(!parseInt(id)) throw new NotFoundError(`it's a string!: ${id}`)
     const jobRes = await db.query(
         `SELECT id, title, salary, equity, company_handle 
            FROM jobs
@@ -115,15 +116,20 @@ class Job {
    **/
 
   static async remove(id) {
+    // console.log('TYPE OF ID IS:', parseInt(id))
+    if(!parseInt(id)) throw new NotFoundError(`it's a string!: ${id}`)
+
     const result = await db.query(
         `DELETE
            FROM jobs
            WHERE id = $1
-           RETURNING id`,
+           RETURNING id, company_handle, title`,
         [id]);
+        console.log('OUR JOB WE ARE TRYING TO FIND:', id, result.rows[0])
     const job = result.rows[0];
-
+    
     if (!job) throw new NotFoundError(`No job: ${id}`);
+    return job;
   }
 }
 

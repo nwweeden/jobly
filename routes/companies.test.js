@@ -19,7 +19,7 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-// TODO: create a seperate token that is admin user and update these tests accordingly
+
 describe("POST /companies", function () {
   test("ok for admin", async function () {
     const resp = await request(app)

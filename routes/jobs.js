@@ -9,7 +9,8 @@ const { BadRequestError } = require("../expressError");
 const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Job = require("../models/Job");
 
-// const companyNewSchema = require("../schemas/companyNew.json");
+const jobNewSchema = require("../schemas/jobNew.json");
+const jobUpdateSchema = require("../schemas/jobUpdate.json");
 
 
 const router = new express.Router();
@@ -27,7 +28,7 @@ const router = new express.Router();
 
 router.get("/", async function (req, res, next) {
 try {
-  // TODO - Write our Filtering Funcationality
+  // TODO: - Write our Filtering Funcationality
   // const validator = jsonschema.validate(req.body, companyGetSchema);
   // if (!validator.valid) {
   //   const errs = validator.errors.map(e => e.stack);
@@ -81,41 +82,42 @@ router.post("/", ensureAdmin, async function (req, res, next) {
   }
 });
 
-/** PATCH /[handle] { fld1, fld2, ... } => { company }
+/** PATCH /[id] { fld1, fld2, ... } => { job }
  *
- * Patches company data.
+ * Patches job data.
  *
- * fields can be: {name, num_employees, description, logo_url}
+ * fields can be: {title, salary, equity}
  *
- * Returns {handle, name, num_employees, description, logo_url}
+ * Returns {job: {id, title, salary, equity}}
  *
  * Authorization required: admin
  **/
 
-router.patch("/:handle", ensureAdmin, async function (req, res, next) {
+router.patch("/:id", ensureAdmin, async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(req.body, companyUpdateSchema);
+    const validator = jsonschema.validate(req.body, jobUpdateSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
 
-    const company = await Company.update(req.params.handle, req.body);
-    return res.json({ company });
+    const job = await Job.update(req.params.id, req.body);
+    return res.json({ job });
   } catch (err) {
     return next(err);
   }
 });
 
-/** DELETE /[handle]  =>  { deleted: handle }
+/** DELETE /[id]  =>  { deleted: {id:, company_handle:, title} }
  *
  * Authorization: admin
  **/
 
-router.delete("/:handle", ensureAdmin, async function (req, res, next) {
+router.delete("/:id", ensureAdmin, async function (req, res, next) {
+  // console.log('THIS IS MADE IT TO THE ROUTE:', req.params.id)
   try {
-    await Company.remove(req.params.handle);
-    return res.json({ deleted: req.params.handle });
+    const job = await Job.remove(req.params.id);
+    return res.json({ deleted: job });
   } catch (err) {
     return next(err);
   }

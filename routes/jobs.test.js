@@ -21,6 +21,8 @@ beforeAll(commonBeforeAll);
 beforeEach(async function() {
   await commonBeforeEach();
   /*get an id for one of our jobs to use in tests*/
+  // const test = await db.query('SELECT * FROM jobs')
+  // console.log('ALL JOBS@!$#@!$!@$%!:', test)
   const engResult = await db.query(`
     SELECT id
     FROM jobs
@@ -114,9 +116,9 @@ describe("GET /jobs", function () {
     expect(resp.body).toEqual({
       jobs:
           [
+            { id: expect.any(Number), title: "cfo" },
             { id: expect.any(Number), title: "engineer" },
             { id: expect.any(Number), title: "recruiter" },
-            { id: expect.any(Number), title: "cfo" },
           ],
     });
   });
@@ -155,8 +157,8 @@ describe("GET /jobs/:id", function () {
     expect(resp.body).toEqual({
       job: {
         id: expect.any(Number),
-        title: "Test",
-        salary: 1,
+        title: "engineer",
+        salary: 1000,
         equity: "0.2",
         company_handle: "c1"
       },
@@ -172,7 +174,7 @@ describe("GET /jobs/:id", function () {
 
 
 describe("PATCH /jobs/:id", function () {
-  test("ok for user", async function () {
+  test("ok for admin", async function () {
     const resp = await request(app)
         .patch(`/jobs/${engId}`)
         .send({
@@ -180,10 +182,10 @@ describe("PATCH /jobs/:id", function () {
           _token: adminToken,
         });
     expect(resp.body).toEqual({
-      company: {
+      job: {
         id: engId,
         title: "Senior Engineer",
-        salary: 1,
+        salary: 1000,
         equity: "0.2",
         company_handle: "c1"
       },
@@ -238,7 +240,13 @@ describe("DELETE /jobs/:id", function () {
         .send({
           _token: adminToken,
         });
-    expect(resp.body).toEqual({ deleted: engId });
+    expect(resp.body).toEqual({
+      deleted: {
+        id: engId,
+        company_handle:'c1',
+        title: 'engineer'
+      }
+    });
   });
 
   test("fails for anon", async function () {
@@ -264,4 +272,5 @@ describe("DELETE /jobs/:id", function () {
         });
     expect(resp.statusCode).toEqual(404);
   });
+  // TODO: do we want to specifiy the type of error a missing job isFinite(number/string?)
 })
