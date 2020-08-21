@@ -1,4 +1,4 @@
-const { sqlForPartialUpdate, sqlForFiltering } = require('./sql.js')
+const { sqlForPartialUpdate, sqlForFiltering, sqlForJobsFiltering } = require('./sql.js')
 const { BadRequestError } = require('../expressError.js')
 
 describe("sqlForPartialUpdate", function () {
@@ -89,4 +89,60 @@ describe("sqlForFiltering", function () {
       values: ['%2%']
     })
   })
+
+  test("return empty object when no filters", async function() {
+    const data ={_token: 'sample token'};
+
+    const result = sqlForFiltering(data)
+
+    expect(result).toEqual({})
+  })
 })
+
+
+
+
+describe("sqlForJobsFiltering", function () {
+  
+  test("sucess for multiple inputs", async function () {
+    const data ={title: "CEO", minSalary: 2000, hasEquity: true}
+
+    const result = sqlForJobsFiltering(data)
+
+    expect(result).toEqual({
+        whereClause: 'WHERE title ILIKE $1 AND salary >= $2 AND equity > $3',
+        values: ["%CEO%", 2000, 0]
+      })
+  })
+
+  test("sucess for one input", async function () {
+    const data ={minSalary: 10}
+
+    const result = sqlForJobsFiltering(data)
+
+    expect(result).toEqual({
+        whereClause: 'WHERE salary >= $1',
+        values: [10]
+      })
+  })
+
+  test("failure for one input", async function () {
+    const data ={minSalary: 10}
+
+    const result = sqlForJobsFiltering(data)
+
+    expect(result).not.toEqual({
+        whereClause: 'WHERE salary >= $1',
+        values: ['10']
+      })
+  })
+
+  test("return empty object when no filters", async function() {
+    const data ={_token: 'sample token'};
+
+    const result = sqlForJobsFiltering(data)
+
+    expect(result).toEqual({})
+  })
+
+});

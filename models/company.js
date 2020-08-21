@@ -19,8 +19,8 @@ class Company {
     /*if there are filters, organize them in a WHERE clause*/
     if (Object.keys(userFilters).length > 0){
       const filters = sqlForFiltering(userFilters);
-      where = filters.whereClause;
-      filterValues = filters.values;
+      where = filters.whereClause || '';
+      filterValues = filters.values || [];
       // console.log('filterValues', filterValues);
     }
     const companiesRes = await db.query(

@@ -61,7 +61,54 @@ function sqlForFiltering(userFilters) {
   whereClause = whereClause.slice(0, removeAnd);
   // console.log('Return Object from sqlForFiltering', {whereClause, values});
   
-  return {whereClause, values};
+  if(values.length > 0) {
+    return {whereClause, values};
+  } else {
+    return {};
+  }
 }
 
-module.exports = { sqlForPartialUpdate, sqlForFiltering };
+/** Writes a WHERE clause to filter our Job.findAll() search 
+ * Takes an object with the following optional keys/values:
+ * - title (case insensitive, matches any part of string)
+ * - minSalary (finds jobs with at least this salary)
+ * - hasEquity (if true, finds jobs with equity > 0)
+ * 
+ * {title: engineer, hasEquity: true} ==>
+ * {whereClause: 'WHERE title ILIEE $1 AND equity > $2',
+ * values: [engineer, 0]}
+*/
+function sqlForJobsFiltering(userFilters) {
+  let filterPlaceholder = 1;
+  let values = [];
+  let filters = [];
+
+  if(userFilters.title) {
+    let revisedTitle = '%'+ (userFilters.title) +'%';
+    values.push(revisedTitle)
+    filters.push(`title ILIKE $${filterPlaceholder}`);
+    filterPlaceholder ++;
+  }
+
+  if(userFilters.minSalary) {
+    values.push(userFilters.minSalary);
+    filters.push(`salary >= $${filterPlaceholder}`);
+    filterPlaceholder ++;
+  }
+
+  if(userFilters.hasEquity === true) {
+    values.push(0);
+    filters.push(`equity > $${filterPlaceholder}`);
+  }
+
+  if (values.length > 0) {
+    let whereClause = 'WHERE '.concat(filters.join(' AND '));
+    return {whereClause, values};
+  } else {
+    return {};
+  }
+};
+  
+
+
+module.exports = { sqlForPartialUpdate, sqlForFiltering, sqlForJobsFiltering };
