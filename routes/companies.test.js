@@ -23,15 +23,15 @@ afterAll(commonAfterAll);
 describe("POST /companies", function () {
   test("ok for admin", async function () {
     const resp = await request(app)
-        .post("/companies")
-        .send({
-          handle: "cnew",
-          name: "CNew",
-          logo_url: "http://cnew.img",
-          description: "DescNew",
-          num_employees: 10,
-          _token: adminToken,
-        });
+      .post("/companies")
+      .send({
+        handle: "cnew",
+        name: "CNew",
+        logo_url: "http://cnew.img",
+        description: "DescNew",
+        num_employees: 10,
+        _token: adminToken,
+      });
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
       company: {
@@ -46,53 +46,53 @@ describe("POST /companies", function () {
 
   test("unauth for anon", async function () {
     const resp = await request(app)
-        .post("/companies")
-        .send({
-          handle: "cnew",
-          name: "CNew",
-          logo_url: "http://cnew.img",
-          description: "DescNew",
-          num_employees: 10,
-        });
+      .post("/companies")
+      .send({
+        handle: "cnew",
+        name: "CNew",
+        logo_url: "http://cnew.img",
+        description: "DescNew",
+        num_employees: 10,
+      });
     expect(resp.statusCode).toEqual(401);
   });
 
   test("unauth for user", async function () {
     const resp = await request(app)
-        .post("/companies")
-        .send({
-          handle: "cnew",
-          name: "CNew",
-          logo_url: "http://cnew.img",
-          description: "DescNew",
-          num_employees: 10,
-          _token: u1Token
-        });
+      .post("/companies")
+      .send({
+        handle: "cnew",
+        name: "CNew",
+        logo_url: "http://cnew.img",
+        description: "DescNew",
+        num_employees: 10,
+        _token: u1Token
+      });
     expect(resp.statusCode).toEqual(401);
   });
 
   test("fails with missing data", async function () {
     const resp = await request(app)
-        .post("/companies")
-        .send({
-          handle: "cnew",
-          num_employees: 10,
-          _token: adminToken,
-        });
+      .post("/companies")
+      .send({
+        handle: "cnew",
+        num_employees: 10,
+        _token: adminToken,
+      });
     expect(resp.statusCode).toEqual(400);
   });
 
   test("fails with invalid data", async function () {
     const resp = await request(app)
-        .post("/companies")
-        .send({
-          handle: "cnew",
-          name: "CNew",
-          logo_url: "not-a-url",
-          description: "DescNew",
-          num_employees: 10,
-          _token: adminToken,
-        });
+      .post("/companies")
+      .send({
+        handle: "cnew",
+        name: "CNew",
+        logo_url: "not-a-url",
+        description: "DescNew",
+        num_employees: 10,
+        _token: adminToken,
+      });
     expect(resp.statusCode).toEqual(400);
   });
 });
@@ -103,18 +103,26 @@ describe("GET /companies", function () {
     const resp = await request(app).get("/companies");
     expect(resp.body).toEqual({
       companies:
-          [
-            { handle: "c1", name: "C1" },
-            { handle: "c2", name: "C2" },
-            { handle: "c3", name: "C3" },
-          ],
+        [
+          { handle: "c1", name: "C1" },
+          { handle: "c2", name: "C2" },
+          { handle: "c3", name: "C3" },
+        ],
     });
   });
 
-    test("fail filters to get company", async function () {
-      const resp = await request(app).get("/companies")
-        .send({name: 123});
-      expect(resp.statusCode).toEqual(400);
+  test("fail filters to get company", async function () {
+    const resp = await request(app).get("/companies")
+      .send({ name: 123 });
+    expect(resp.statusCode).toEqual(400);
+  });
+
+  test("fails for invalid filters", async function () {
+    const resp = await request(app)
+      .get(`/companies/`)
+      .send({ name: 123 });
+
+    expect(resp.statusCode).toEqual(400);
   });
 
   test("test next() handler", async function () {
@@ -123,8 +131,8 @@ describe("GET /companies", function () {
     // should cause an error, all right :)
     await db.query("DROP TABLE companies CASCADE");
     const resp = await request(app)
-        .get("/companies")
-        .send({ _token: u1Token });
+      .get("/companies")
+      .send({ _token: u1Token });
     expect(resp.statusCode).toEqual(500);
   });
 });
@@ -149,24 +157,17 @@ describe("GET /companies/:handle", function () {
     expect(resp.statusCode).toEqual(404);
   });
 
-test("fails for invalid filters", async function () {
-  const resp = await request(app)
-    .get(`/companies/`)
-    .send({name: 123});
-  
-    expect(resp.statusCode).toEqual(400);
-  });
 });
 
 
 describe("PATCH /companies/:handle", function () {
   test("ok for user", async function () {
     const resp = await request(app)
-        .patch(`/companies/c1`)
-        .send({
-          name: "C1-new",
-          _token: adminToken,
-        });
+      .patch(`/companies/c1`)
+      .send({
+        name: "C1-new",
+        _token: adminToken,
+      });
     expect(resp.body).toEqual({
       company: {
         handle: "c1",
@@ -180,40 +181,40 @@ describe("PATCH /companies/:handle", function () {
 
   test("fails for anon", async function () {
     const resp = await request(app)
-        .patch(`/companies/c1`)
-        .send({
-          name: "C1-new",
-        });
+      .patch(`/companies/c1`)
+      .send({
+        name: "C1-new",
+      });
     expect(resp.statusCode).toEqual(401);
   });
 
   test("fails for user", async function () {
     const resp = await request(app)
-        .patch(`/companies/c1`)
-        .send({
-          name: "C1-new",
-          _token: u1Token
-        });
+      .patch(`/companies/c1`)
+      .send({
+        name: "C1-new",
+        _token: u1Token
+      });
     expect(resp.statusCode).toEqual(401);
   });
 
   test("fails on handle change attempt", async function () {
     const resp = await request(app)
-        .patch(`/companies/c1`)
-        .send({
-          handle: "c1-new",
-          _token: adminToken,
-        });
+      .patch(`/companies/c1`)
+      .send({
+        handle: "c1-new",
+        _token: adminToken,
+      });
     expect(resp.statusCode).toEqual(400);
   });
 
   test("fails on invalid data", async function () {
     const resp = await request(app)
-        .patch(`/companies/c1`)
-        .send({
-          logo_url: "not-a-url",
-          _token: adminToken,
-        });
+      .patch(`/companies/c1`)
+      .send({
+        logo_url: "not-a-url",
+        _token: adminToken,
+      });
     expect(resp.statusCode).toEqual(400);
   });
 });
@@ -222,34 +223,34 @@ describe("PATCH /companies/:handle", function () {
 describe("DELETE /companies/:handle", function () {
   test("ok for admin", async function () {
     const resp = await request(app)
-        .delete(`/companies/c1`)
-        .send({
-          _token: adminToken,
-        });
+      .delete(`/companies/c1`)
+      .send({
+        _token: adminToken,
+      });
     expect(resp.body).toEqual({ deleted: "c1" });
   });
 
   test("fails for anon", async function () {
     const resp = await request(app)
-        .delete(`/companies/c1`);
+      .delete(`/companies/c1`);
     expect(resp.statusCode).toEqual(401);
   });
 
   test("fails for user", async function () {
     const resp = await request(app)
-        .delete(`/companies/c1`)
-        .send({
-          _token: u1Token
-        })
+      .delete(`/companies/c1`)
+      .send({
+        _token: u1Token
+      })
     expect(resp.statusCode).toEqual(401);
   });
 
   test("fails for missing company", async function () {
     const resp = await request(app)
-        .delete(`/companies/nope`)
-        .send({
-          _token: adminToken,
-        });
+      .delete(`/companies/nope`)
+      .send({
+        _token: adminToken,
+      });
     expect(resp.statusCode).toEqual(404);
   });
 })

@@ -14,7 +14,7 @@ class Job {
    *
    * Returns [{ id, title }, ...] (empty list if none found)
    * */
-  static async findAll() {
+  static async findAll({}) {
     const jobsRes = await db.query(
       `SELECT id, title
       FROM jobs
