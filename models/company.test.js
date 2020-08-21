@@ -90,6 +90,17 @@ describe("get", function () {
       num_employees: 1,
       description: "Desc1",
       logo_url: "http://c1.img",
+      jobs: [{
+        id: expect.any(Number),
+        title: 'engineer',
+        salary: 1000,
+        equity: '0.2'},
+      {
+        id: expect.any(Number),
+        title: 'recruiter',
+        salary: 12000,
+        equity: null
+      }]
     });
   });
 

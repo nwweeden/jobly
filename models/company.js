@@ -9,6 +9,9 @@ const { sqlForPartialUpdate, sqlForFiltering } = require("../helpers/sql");
 class Company {
   /** Find all companies.
    *
+   * userFilters may include:
+   * {name, minEmployees, maxEmployees}
+   * 
    * Returns [{ handle, name }, ...] (empty list if none found)
    * */
   // CR: 
@@ -32,9 +35,10 @@ class Company {
     return companiesRes.rows;
   }
 
-  /** Given a company handle, return data about company.
+  /** Given a company handle, return data about company and associated jobs.
    *
-   * Returns { handle, name, num_employees, description, logo_url }
+   * Returns { handle, name, num_employees, description, logo_url
+   *            jobs: [ {id, title, salary, equity}...] }
    *
    * Throws NotFoundError if not found.
    **/
@@ -45,11 +49,21 @@ class Company {
            FROM companies
            WHERE handle = $1`,
         [handle]);
-
+  
     const company = companyRes.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
+    
+    const jobsRes = await db.query(
+      `SELECT id, title, salary, equity
+      FROM jobs
+      WHERE company_handle = $1
+      ORDER BY title`, 
+      [handle]);
 
+    const jobs = jobsRes.rows;
+
+    company.jobs = jobs;
     return company;
   }
 

@@ -10,17 +10,20 @@ const {
 
 class Job {
 
-    /** Find all jobs.
-   *
-   * Returns [{ id, title }, ...] (empty list if none found)
-   * */
+  /** Find all jobs.
+ *
+ * jobFilters may include:
+ * {title (string), minSalary (integer), hasEquity (boolean)}
+ * 
+ * Returns [{ id, title }, ...] (empty list if none found)
+ * */
   static async findAll(jobFilters) {
     let filterValues;
     let where = ''
 
-    if(Object.keys(jobFilters).length > 0){
+    if (Object.keys(jobFilters).length > 0) {
       const filters = sqlForJobsFiltering(jobFilters);
-      console.log('FILTERS AREEEEEEEEE:', filters)
+      // console.log('FILTERS AREEEEEEEEE:', filters)
       where = filters.whereClause || '';
       filterValues = filters.values || [];
     }
@@ -41,12 +44,12 @@ class Job {
    **/
 
   static async get(id) {
-    if(!parseInt(id)) throw new NotFoundError(`it's a string!: ${id}`)
+    if (!parseInt(id)) throw new NotFoundError(`it's a string!: ${id}`)
     const jobRes = await db.query(
-        `SELECT id, title, salary, equity, company_handle 
+      `SELECT id, title, salary, equity, company_handle 
            FROM jobs
            WHERE id = $1`,
-        [id]);
+      [id]);
 
     const job = jobRes.rows[0];
 
@@ -65,18 +68,18 @@ class Job {
 
   static async create({ title, salary, equity, company_handle }) {
     // TODO consider furhter our assumption that duplicate jobs are not a problem
-    
+
     const newJob = await db.query(
-        `INSERT INTO jobs
+      `INSERT INTO jobs
            (title, salary, equity, company_handle)
            VALUES ($1, $2, $3, $4)
            RETURNING id, title, salary, equity, company_handle`,
-        [
-          title,
-          salary,
-          equity,
-          company_handle,
-        ],
+      [
+        title,
+        salary,
+        equity,
+        company_handle,
+      ],
     );
     const job = newJob.rows[0];
 
@@ -98,7 +101,7 @@ class Job {
 
   static async update(id, data) {
     if (Object.keys(data).length === 0) throw new BadRequestError("No data");
-    
+
     const { setCols, values } = sqlForPartialUpdate(data);
     const idVarIdx = "$" + (values.length + 1);
 
@@ -126,17 +129,17 @@ class Job {
 
   static async remove(id) {
     // console.log('TYPE OF ID IS:', parseInt(id))
-    if(!parseInt(id)) throw new NotFoundError(`it's a string!: ${id}`)
+    if (!parseInt(id)) throw new NotFoundError(`it's a string!: ${id}`)
 
     const result = await db.query(
-        `DELETE
+      `DELETE
            FROM jobs
            WHERE id = $1
            RETURNING id, company_handle, title`,
-        [id]);
-        console.log('OUR JOB WE ARE TRYING TO FIND:', id, result.rows[0])
+      [id]);
+    console.log('OUR JOB WE ARE TRYING TO FIND:', id, result.rows[0])
     const job = result.rows[0];
-    
+
     if (!job) throw new NotFoundError(`No job: ${id}`);
     return job;
   }

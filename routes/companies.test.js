@@ -148,6 +148,17 @@ describe("GET /companies/:handle", function () {
         description: "Desc1",
         num_employees: 1,
         logo_url: null,
+        jobs: [{
+          id: expect.any(Number),
+          title: 'engineer',
+          salary: 1000,
+          equity: '0.2'},
+        {
+          id: expect.any(Number),
+          title: 'recruiter',
+          salary: 12000,
+          equity: null
+        }]
       },
     });
   });
