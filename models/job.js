@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../db");
-const { sqlForPartialUpdate, sqlForFiltering } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForJobsFiltering } = require("../helpers/sql");
 
 const {
   BadRequestError,
@@ -15,11 +15,20 @@ class Job {
    * Returns [{ id, title }, ...] (empty list if none found)
    * */
   static async findAll(jobFilters) {
+    let filterValues;
+    let where = ''
+
+    if(Object.keys(jobFilters).length > 0){
+      const filters = sqlForJobsFiltering(jobFilters);
+      console.log('FILTERS AREEEEEEEEE:', filters)
+      where = filters.whereClause || '';
+      filterValues = filters.values || [];
+    }
     const jobsRes = await db.query(
       `SELECT id, title
       FROM jobs
-      ORDER BY title`
-    );
+      ${where}
+      ORDER BY title`, filterValues);
 
     return jobsRes.rows;
   }

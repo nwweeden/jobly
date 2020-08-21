@@ -29,7 +29,7 @@ afterAll(commonAfterAll);
 
 describe("findAll", function () {
   test("all no filter", async function () {
-    let jobs = await Job.findAll();
+    let jobs = await Job.findAll({});
     expect(jobs).toEqual([
       { id: expect.any(Number), title: "cfo" },
       { id: expect.any(Number), title: "engineer" },
@@ -37,65 +37,62 @@ describe("findAll", function () {
     ]);
   });
 
-// TODO: remove this when we uncomment below
-});
+  test("equity equals false", async function () {
+    let jobs = await Job.findAll({
+      hasEquity: false
+    });
+    
+    expect(jobs).toEqual([
+      { id: expect.any(Number), title: "cfo" },
+      { id: expect.any(Number), title: "engineer" },
+      { id: expect.any(Number), title: "recruiter" },
+    ]);
+  });
 
-//   test("filter num_employees >= 3", async function () {
-//     let companies = await Company.findAll(
-//       {minEmployees: 3}
-//     );
-//     expect(companies).toEqual([
-//       {handle: "c3", name: "C3"}
-//     ]);
-//   });
+  test("filter minSalary >= 11000", async function () {
+    let jobs = await Job.findAll(
+      {minSalary: 11000}
+    );
+    expect(jobs).toEqual([
+      {id: expect.any(Number), title: "recruiter"},
+    ]);
+  });
 
-//   test("filter num_employees <=2", async function () {
-//     let companies = await Company.findAll(
-//       {maxEmployees: 2}
-//     );
-//     expect(companies).toEqual([
-//         {handle: "c1", name: "C1"},
-//         {handle: "c2", name: "C2"}
-//       ]);
-//     });
-  
-//   test("filter num_employees > largest company", async function () {
-//     let companies = await Company.findAll(
-//       {minEmployees: 4}
-//     );
-//     expect(companies).toEqual([]);
-//   });
-  
-//   test("filter name (case insensitve)", async function () {
-//     let companies = await Company.findAll(
-//       {name: 'c2'}
-//     );
-//     expect(companies).toEqual([
-//       { handle: "c2", name: "C2"}
-//     ]);
-//   });
+  test("filter equity > 0", async function () {
+    let jobs = await Job.findAll(
+      {hasEquity: true}
+    );
+    expect(jobs).toEqual([
+        {id: expect.any(Number), title: "cfo"},
+        {id: expect.any(Number), title: "engineer"},
+      ]);
+    });
+    
+    test("filter title (case insensitve)", async function () {
+      let jobs = await Job.findAll(
+        {title: 'CFO'}
+      );
+      expect(jobs).toEqual([
+        {id: expect.any(Number), title: "cfo"}
+      ]);
+    });
 
-//   test("min > max", async function () {
-//     expect.assertions(1);
-//     try {
-//       await Company.findAll({
-//         minEmployees: 3,
-//         maxEmployees: 2
-//       })
-//     } catch (err) {
-//       expect(err).toBeTruthy();
-//     }
-//   })
+  test("salary is greater than largest company", async function () {
+    let jobs = await Job.findAll(
+      {minSalary: 1000000}
+    );
+    expect(jobs).toEqual([]);
+  })
   
-//   test("filter like name", async function () {
-//     let companies = await Company.findAll(
-//       {name: '2'}
-//     );
-//     expect(companies).toEqual([
-//       {handle: "c2",name: "C2"}
-//     ]);
-//   });
-// })
+  test("filter like title", async function () {
+    let jobs = await Job.findAll(
+      {title: 'gin'}
+    );
+    expect(jobs).toEqual([
+      {id: expect.any(Number), title: "engineer"},
+    ]);
+  });
+})
 
 describe("get", function() {
   test("succeeds", async function () {

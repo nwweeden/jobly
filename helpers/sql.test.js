@@ -104,7 +104,7 @@ describe("sqlForFiltering", function () {
 
 describe("sqlForJobsFiltering", function () {
   
-  test("sucess for multiple inputs", async function () {
+  test("success for multiple inputs", async function () {
     const data ={title: "CEO", minSalary: 2000, hasEquity: true}
 
     const result = sqlForJobsFiltering(data)
@@ -115,7 +115,26 @@ describe("sqlForJobsFiltering", function () {
       })
   })
 
-  test("sucess for one input", async function () {
+  test("success for false equity", async function () {
+    const data ={hasEquity: false}
+
+    const result = sqlForJobsFiltering(data)
+
+    expect(result).toEqual({})
+  })
+
+  test("success for false equity and min salary of 10000", async function () {
+    const data ={minSalary: 10000, hasEquity: false}
+
+    const result = sqlForJobsFiltering(data)
+
+    expect(result).toEqual({
+      whereClause: 'WHERE salary >= $1',
+      values: [10000]
+    })
+  })
+
+  test("success for one input", async function () {
     const data ={minSalary: 10}
 
     const result = sqlForJobsFiltering(data)

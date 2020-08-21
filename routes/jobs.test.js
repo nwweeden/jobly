@@ -123,20 +123,47 @@ describe("GET /jobs", function () {
     });
   });
 
-  //   test("fail filters to get company", async function () {
-  //     const resp = await request(app).get("/companies")
-  //       .send({name: 123});
-  //     expect(resp.statusCode).toEqual(400);
-  // });
+  test("get with multiple filters success", async function () {
+    const resp = await request(app)
+      .get("/jobs")
+      .send({minSalary: 10000, hasEquity: false})
+
+      expect(resp.body).toEqual({
+      jobs:[{
+        id: expect.any(Number), title: "cfo", 
+      },
+      {
+        id: expect.any(Number), title: "recruiter"
+      }] 
+    });
+  });
+
+  test("get with one filter success", async function () {
+    const resp = await request(app)
+      .get("/jobs")
+      .send({title: 'cfo'})
+
+      expect(resp.body).toEqual({
+      jobs:[{
+        id: expect.any(Number), title: "cfo" 
+      }]
+    });
+  });
+
+    test("No jobs meet filter", async function () {
+      const resp = await request(app).get("/jobs")
+        .send({title:'job does not exist'});
+      expect(resp.body).toEqual({jobs: []});
+  });
 
 
-  // test("fails for invalid filters", async function () {
-  //   const resp = await request(app)
-  //     .get(`/companies/`)
-  //     .send({name: 123});
+  test("fails for invalid filters", async function () {
+    const resp = await request(app)
+      .get(`/jobs`)
+      .send({title: 123});
     
-  //     expect(resp.statusCode).toEqual(400);
-  //   });
+      expect(resp.statusCode).toEqual(400);
+    });
 
   test("test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---

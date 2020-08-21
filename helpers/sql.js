@@ -96,6 +96,13 @@ function sqlForJobsFiltering(userFilters) {
     filterPlaceholder ++;
   }
 
+  /**Removed because we do not include this filtering */
+  // if(userFilters.hasEquity === false) {
+  //   values.push(null);
+  //   filters.push(`equity IS $${filterPlaceholder}`);
+  //   filterPlaceholder ++;
+  // }
+
   if(userFilters.hasEquity === true) {
     values.push(0);
     filters.push(`equity > $${filterPlaceholder}`);
