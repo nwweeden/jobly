@@ -123,3 +123,84 @@ describe("register", function () {
   });
 });
 
+// TODO: add in tests for admin (most of these are probably already written above)
+// describe("create as admin", function () {
+//   test("succeeds", async function () {
+//     let user = await User.register({
+//       username: "futureadmin",
+//       password: "password",
+//       first_name: "future",
+//       last_name: "admin",
+//       email: "future@admin.com",
+//       is_admin: true,
+//     });
+//     expect(user).toEqual({
+//       username: "futureadmin",
+//       first_name: "future",
+//       last_name: "admin",
+//       email: "future@admin.com",
+//       is_admin: true,
+//     });
+//     const found = await db.query("SELECT * FROM users WHERE username = 'futureadmin'");
+//     expect(found.rows.length).toEqual(1);
+//     expect(found.rows[0].is_admin).toEqual(true);
+//     expect(found.rows[0].password.startsWith("$2b$")).toEqual(true);
+//   });
+
+//   test("succeeds: admin user", async function () {
+//     let user = await User.register({
+//       username: "new",
+//       password: "password",
+//       first_name: "Test",
+//       last_name: "Tester",
+//       email: "test@test.com",
+//       is_admin: true,
+//     });
+//     expect(user).toEqual({
+//       username: "new",
+//       first_name: "Test",
+//       last_name: "Tester",
+//       email: "test@test.com",
+//       is_admin: true,
+//     });
+//     const found = await db.query("SELECT * FROM users WHERE username = 'new'");
+//     expect(found.rows.length).toEqual(1);
+//     expect(found.rows[0].is_admin).toEqual(true);
+//     expect(found.rows[0].password.startsWith("$2b$")).toEqual(true);
+//   });
+
+//   test("fails with missing data", async function () {
+//     expect.assertions(1);
+//     try {
+//       await User.register({
+//         username: "new",
+//         password: "password",
+//         first_name: "Test",
+//         last_name: "Tester",
+//       });
+//     } catch (err) {
+//       expect(err).toBeTruthy();
+//     }
+//   });
+
+//   test("fails with dup data", async function () {
+//     expect.assertions(1);
+//     try {
+//       await User.register({
+//         username: "test",
+//         password: "password2",
+//         first_name: "Test2",
+//         last_name: "Tester2",
+//         email: "test2@test.com",
+//         is_admin: false,
+//       });
+//     } catch (err) {
+//       expect(err).toBeTruthy();
+//     }
+//   });
+// });
+
+
+
+
+

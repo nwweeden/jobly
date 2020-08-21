@@ -12,9 +12,6 @@
     },
     "hasEquity": {
       "type": "boolean"
-    },
-    "_token": {
-      "type": "string"
     }
   },
   "additionalProperties": false,

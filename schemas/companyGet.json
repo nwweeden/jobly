@@ -15,9 +15,6 @@
     "maxEmployees": {
       "type": "integer",
       "minimum": 0
-    },
-    "_token": {
-      "type": "string"
     }
   },
   "additionalProperties": false,
