@@ -4,7 +4,7 @@
 
 const jsonschema = require("jsonschema");
 
-const User = require("../models/User");
+const User = require("../models/user");
 const express = require("express");
 const router = new express.Router();
 const { createToken } = require("../helpers/tokens");
@@ -48,9 +48,9 @@ router.post("/token", async function (req, res, next) {
  * Authorization required: none
  */
 
-router.post("/register", ensureAdmin, async function (req, res, next) {
+router.post("/register", async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(req.body, userRegisterAdminSchema);
+    const validator = jsonschema.validate(req.body, userRegisterSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
@@ -73,9 +73,10 @@ router.post("/register", ensureAdmin, async function (req, res, next) {
  * Authorization required: admin
  */
 
-router.post("/register-admin", async function (req, res, next) {
+//  TODO: need to include tests for this route:
+router.post("/register-admin", ensureAdmin, async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(req.body, userRegisterSchema);
+    const validator = jsonschema.validate(req.body, userRegisterAdminSchema);
     if (!validator.valid) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
