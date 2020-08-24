@@ -50,7 +50,13 @@ INSERT INTO users(username,
    'Test',
    'User',
    'test@test.com',
-   FALSE);
+   FALSE),
+   ('admintest',
+   '$2b$04$eSgweZxXr79E3q26egv3mOeWTkxKOj8ga5t7aSo6qNUJzmUzjt7ia',
+   'adminTest',
+   'adminUser',
+   'admin@test.com',
+   TRUE);
 
 INSERT INTO companies(handle, name, num_employees, description)
   VALUES
